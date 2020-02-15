@@ -1,0 +1,32 @@
+items:
+  1:
+    # Пункт меню с подпунктами
+    title: '1. Item_1'
+    items:
+      1:
+        title: '1. SubItem_1'
+        # Переменная указывающая окружение в которой выполняется команда
+        # по большому счету имя секции в .ini файле в которой записываются
+        # настройки
+        env: 'dev'
+        commands: 
+          - 'echo "Sub item example Sub item example Sub item example"'
+          - 'echo "Sub item example Sub item example"'
+          - 'echo "Sub item example"'
+      2:
+        title: '2. SubItem_2'
+        env: 'dev'
+        commands: 
+          - 'echo %(example)s'
+        vars:
+          # Переменные необходимые для выполнения команд
+          # введенные ранее записываются в .ini
+          - example
+      3:
+        title: '3. SubItem_3'
+        items:
+          1:
+            title: '1. Curentdir'
+            env: 'dev'
+            commands: 
+              - 'echo %(currentDir)s'

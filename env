@@ -1,0 +1,121 @@
+#!/usr/bin/python3
+
+import os
+import configparser
+import time
+import yaml
+
+# Работа с переменными
+# Считываем/записываем в .ini
+#
+class Variables():
+
+    __config = None
+
+    __iniFileName = None
+
+    def __init__(self, iniFile):
+        self.__iniFileName = iniFile
+        self.__config = configparser.ConfigParser()
+        if os.path.exists(self.__iniFileName):
+            self.__config.read(self.__iniFileName)
+
+    def __writeIni(self):
+        try:
+            iniFile = open(self.__iniFileName, "w")
+            self.__config.write(iniFile)
+            iniFile.flush()
+        except:
+            return False
+
+    def getVar(self, env, varName):
+        try:
+            var = self.__config.get(env, varName)
+        except:
+            var = ''
+
+        newVar = input("input {0} ({1}): ".format(varName, var))
+        if not newVar == '':
+            if not self.__config.has_section(env):
+                self.__config.add_section(env)
+            self.__config.set(env, varName, newVar)
+            self.__writeIni()
+            return newVar
+
+        return var
+
+# Отрисовываем меню
+#
+class Menu():
+
+    __ymlFile = None
+
+    __items = None
+
+    __container = None
+
+    __variables = None
+
+    def __init__(self, container = None, items = None):
+        self.__container = container
+        self.__variables = Variables('env.ini')
+        if items == None:
+            currDir = os.path.dirname(os.path.abspath(__file__))
+            yaml_file = open(currDir + '/menu.yml', "r")
+            try:
+                menu = yaml.load(yaml_file, Loader=yaml.FullLoader)
+            except:
+                menu = yaml.load(yaml_file)
+            self.__items = menu['items']
+        else:
+            self.__items = items
+
+    def showItems(self):
+        print('0. Exit')
+        for i in self.__items:
+            print(self.__items[i]['title'])
+
+    def loop(self):
+        while True:
+            self.showItems()
+            item = input('Chose action: ')
+            if item == '0':
+                break
+            self.choseItem(item)
+
+    def choseItem(self, item):
+        for i in self.__items:
+            if item == str(i):
+                if('items' in self.__items[i]):
+                    subMenu = Menu(self, self.__items[i]['items'])
+                    subMenu.loop()
+                if('commands' in self.__items[i]):
+                    vars = self.__getVars(self.__items[i])
+                    self.__runCommands(self.__items[i], vars)
+
+    def __runCommands(self, item, vars):
+        if('commands' in item):
+            for command in item['commands']:
+                exitCode = os.system(command % vars)
+                if exitCode != 0:
+                    break
+
+
+    def __getVars(self, item):
+        env = item['env']
+        currentDir = os.path.dirname(os.path.abspath(__file__))
+        vars = {'currentDir': currentDir}
+        if 'vars' in item:
+            for varName in item['vars']:
+                v = self.__variables.getVar(env, varName)
+                vars[varName] = v
+        
+        return vars
+
+menu = Menu()
+while True:
+    menu.showItems()
+    item = input('Chose action: ')
+    if item == '0':
+        break
+    menu.choseItem(item)
