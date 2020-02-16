@@ -4,6 +4,8 @@ import os
 import configparser
 import time
 import yaml
+import sys
+import argparse
 
 # Работа с переменными
 # Считываем/записываем в .ini
@@ -93,6 +95,16 @@ class Menu():
                     vars = self.__getVars(self.__items[i])
                     self.__runCommands(self.__items[i], vars)
 
+    def execItem(self, item):
+        for i in self.__items:
+            if item == str(i):
+                if('items' in self.__items[i]):
+                    subMenu = Menu(self, self.__items[i]['items'])
+                    return subMenu
+                if('commands' in self.__items[i]):
+                    vars = self.__getVars(self.__items[i])
+                    self.__runCommands(self.__items[i], vars)
+
     def __runCommands(self, item, vars):
         if('commands' in item):
             for command in item['commands']:
@@ -112,7 +124,18 @@ class Menu():
         
         return vars
 
+parser = argparse.ArgumentParser()
+parser.add_argument ('-e', '--exec', nargs='?')
+namespace = parser.parse_args (sys.argv[1:])
+
 menu = Menu()
+
+if namespace.exec:
+    items = namespace.exec.split('-')
+    for item in items:
+        menu = menu.execItem(item)
+    exit()
+
 while True:
     menu.showItems()
     item = input('Chose action: ')
