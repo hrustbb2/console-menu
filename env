@@ -30,13 +30,17 @@ class Variables():
         except:
             return False
 
-    def getVar(self, env, varName):
+    def getVar(self, env, varName, interactive):
         try:
             var = self.__config.get(env, varName)
         except:
             var = ''
 
-        newVar = input("input {0} ({1}): ".format(varName, var))
+        if interactive or var == '':
+            newVar = input("input {0} ({1}): ".format(varName, var))
+        else:
+            newVar = var
+
         if not newVar == '':
             if not self.__config.has_section(env):
                 self.__config.add_section(env)
@@ -102,7 +106,7 @@ class Menu():
                     subMenu = Menu(self, self.__items[i]['items'])
                     return subMenu
                 if('commands' in self.__items[i]):
-                    vars = self.__getVars(self.__items[i])
+                    vars = self.__getVars(self.__items[i], False)
                     self.__runCommands(self.__items[i], vars)
 
     def __runCommands(self, item, vars):
@@ -113,13 +117,13 @@ class Menu():
                     break
 
 
-    def __getVars(self, item):
+    def __getVars(self, item, interative = True):
         env = item['env']
         currentDir = os.path.dirname(os.path.abspath(__file__))
         vars = {'currentDir': currentDir}
         if 'vars' in item:
             for varName in item['vars']:
-                v = self.__variables.getVar(env, varName)
+                v = self.__variables.getVar(env, varName, interative)
                 vars[varName] = v
         
         return vars
