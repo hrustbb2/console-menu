@@ -62,12 +62,15 @@ class Menu():
 
     __variables = None
 
-    def __init__(self, container = None, items = None):
+    def __init__(self, container = None, items = None, ymlFile = '/menu.yml'):
         self.__container = container
         self.__variables = Variables('env.ini')
         if items == None:
             currDir = os.path.dirname(os.path.abspath(__file__))
-            yaml_file = open(currDir + '/menu.yml', "r")
+            menuDir = ''
+            if os.path.isdir(currDir + '/menu'):
+                menuDir = '/menu'
+            yaml_file = open(currDir + menuDir + ymlFile, "r")
             try:
                 menu = yaml.load(yaml_file, Loader=yaml.FullLoader)
             except:
@@ -92,12 +95,16 @@ class Menu():
     def choseItem(self, item):
         for i in self.__items:
             if item == str(i):
+                if('file' in self.__items[i]):
+                    subMenu = Menu(self, None, self.__items[i]['file'])
+                    subMenu.loop()
                 if('items' in self.__items[i]):
                     subMenu = Menu(self, self.__items[i]['items'])
                     subMenu.loop()
                 if('commands' in self.__items[i]):
                     vars = self.__getVars(self.__items[i])
-                    self.__runCommands(self.__items[i], vars)
+                    if(self.__runCommands(self.__items[i], vars) != True):
+                        self.__catch(self.__items[i], vars)
 
     def execItem(self, item):
         for i in self.__items:
@@ -113,9 +120,14 @@ class Menu():
         if('commands' in item):
             for command in item['commands']:
                 exitCode = os.system(command % vars)
-                if exitCode != 0:
-                    break
+                if(exitCode != 0):
+                    return False
+        return True
 
+    def __catch(self, item, vars):
+        if('catch' in item):
+            for command in item['catch']:
+                os.system(command % vars)
 
     def __getVars(self, item, interative = True):
         env = item['env']
