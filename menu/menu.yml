@@ -1,0 +1,5 @@
+items:
+  1:
+    # Пункт меню с подпунктами
+    title: '1. Item_1'
+    file: '/sub.yml'
