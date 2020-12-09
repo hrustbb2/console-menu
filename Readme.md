@@ -1,15 +1,18 @@
-## Введение
+## Introduction
 
-В данном репозитории представлен инструмент, который представляет собой простой в использовании конструктор консольного меню для быстрого запуска часто повторяющихся команд во время разработки приложений.
+In this repository presented my tool which is simple in use constructor of console menu for fast run often repeat commands during software develop.
 
-В процесе разработки приложений часто приходиться запускать команды для запуска тестов, пересборки фронтенда, остановка/запуск контейнеров и прочее. Многие из таких команд кроме того что весьма многословны, плюс требуют определенных параметров, которые необходимо держать в голове.
+During software develop there is need often to run commands for unit tests, rebuild frontend, stop/run docker containers and etc.
 
-Для решения этой проблеммы и предназначен данный инструмент.
+Many of these commands is very verbose, plus they needs certain params which we should to remember.
 
-## Как использовать
-Меню конфигурируется одним файлом `menu.yml` расположенном в одном каталоге с `./env` либо в каталоге `menu` если меню более обширное и настройки разнесены по нескольким файлам.
+For solution this problem was create this tool.
 
-**Пример настройки в одном файле `menu.yml`**
+## How use it
+
+The console menu configure with one config-file `menu.uml`. He located in same directory with `env` or in `menu` directory (if the meny is complex and his settings spaced in some files)
+
+**Example simple settings in one file `menu.yml`**
 
     items:
 	    1:
@@ -22,17 +25,18 @@
 			vars:
 				- str
 
-В результате после запуска `./env` получим меню всего лишь из одного пункта (не считая `0. Exit`)
+As result we get follow console meny (after run `./env`)
 
     0. Exit
     1. Command 1
 
-Необязательный параметр `catch` позволяет задать набор комманд запускаемых в случае если хотя бы одна команда из секции `commands` завершится с ошибкой
+Not necessary param `catch` sets commands list which runs if at least one command from` commands` section throw error (exit code is not 0).
 
-**Пример настройки вложенного меню**
-Добавим к нашему меню еще один пункт:
+**Example of submenu setting**
 
-	items:
+Let we add still one item to our menu:
+
+    items:
 	    1:
 		    title: '1. Command 1'
 			env: 'dev'
@@ -55,14 +59,14 @@
 					vars:
 						- str
 
-Теперь меню будет выглядеть следующим образом:
+The menu will now look like this:
 
     0. Exit
     1. Command 1
     2. Sub menu
-	
-Выбрав пункт `2. Sub menu` оказываемся в подменю
 
-**Пример для настройки меню разнесенного на несколько файлов вы можете увидеть в репозитории**
+When we chose item 2 then we have look submenu:
 
-Пример для применения в веб-разработке можно посмотреть в репозитории `https://github.com/hrustbb2/env-example.git`
+**An example for setting up a menu spaced across multiple files you can see in this repository**
+
+An example for use in web development can be viewed in the repository `https://github.com/hrustbb2/env-example.git`
